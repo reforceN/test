@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include <curl/curl.h>
 #define ll long long
 
 using namespace std;
@@ -23,6 +24,7 @@ int xwish[] = {382,444,504};
 int ywish[] = {979,979,979};
 
 int temp = 0;
+const string webhook_url = "";
 
 
 void stc(int color) {
@@ -31,6 +33,25 @@ void stc(int color) {
 
 void cls(){
     system("cls");
+}
+
+
+void WebhookMessage(string message){
+    CURL* curl = curl_easy_init();
+
+    std::string payload = "{\"content\": \"" + message + "\"}";
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, webhook_url.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
+
+    CURLcode res = curl_easy_perform(curl);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
 }
 
 void typeKey(int vkCode) {
@@ -103,6 +124,7 @@ bool try_finding_a_good_card_and_grab(){
             grabCard_arraywise(i);
             dp = true;
             log("clanker thinks this card is better",true);
+            WebhookMessage("<@813849200831103047> <@744095326121754683> i found a card above 100 wishlist!!yayyyy");
             break;
         }
     }
@@ -116,9 +138,36 @@ bool try_finding_a_good_card_and_grab(){
     return dp;
 }
 
+bool gen_find_and_grab(){
+    bool dp = false;
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+
+    HDC hdc = GetDC(NULL); 
+
+    if (hdc == NULL) {
+        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
+        std::cerr << "Failed to get Device Context." << std::endl;
+        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
+        return dp;
+    }
+
+    //
+
+    if(dp == false){
+        log("clanker didnt find a good card",true);
+    }
+    
+
+    ReleaseDC(NULL, hdc);
+    return dp;
+}
+
 int main(){
     srand(time(__null));
 
+    WebhookMessage("Starting the thing hi uh im shy");
     std::cout<<"Starting..\n Please close yasb and open discord halfscreen\n";
 
     Sleep(7000); //tab in
@@ -128,6 +177,7 @@ int main(){
     int sdTimes = 0;
     int clankerbrain = 0;
     ll t = time(0);
+    string temptext = "";
 
     while(!GetAsyncKeyState('P')){
         cout<<"sd: "; stc(10);
@@ -137,6 +187,9 @@ int main(){
         cout<<clankerbrain<<"\n"; stc(7);
 
         cout<<"time elapsed: "<<time(0)-t<<" seconds, "<<float((time(0)-t)/60.0f)<<" minutes, "<<float(((time(0)-t)/60.0f)/60.0f)<<" hours.\n";
+
+        temptext = "i did sd " + to_string(sdTimes+1) + " times hehehehe";
+        WebhookMessage(temptext);
 
         sdropsend();
         Sleep(7000);
@@ -161,3 +214,4 @@ int main(){
 
     return 0;
 }
+
