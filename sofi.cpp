@@ -71,6 +71,14 @@ void log(string text, bool n){
     if(n) cout<<"\n";
 }
 
+void DeviceContextFailMessage(){
+    WebhookMessage("HDC FAIL MAX SECUTITY ME AJUDAAA");
+    log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
+    WebhookMessage("It got force stopped i think?");
+    std::cerr << "Failed to get Device Context." << std::endl;
+    log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
+}
+
 void sdropsend(){
     mouseClick(368, 1046);
     typeKey(0x53);
@@ -107,9 +115,7 @@ bool try_finding_a_good_card_and_grab(){
     HDC hdc = GetDC(NULL); 
 
     if (hdc == NULL) {
-        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
-        std::cerr << "Failed to get Device Context." << std::endl;
-        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
+        DeviceContextFailMessage();
         return dp;
     }
 
@@ -124,7 +130,7 @@ bool try_finding_a_good_card_and_grab(){
             grabCard_arraywise(i);
             dp = true;
             log("clanker thinks this card is better",true);
-            WebhookMessage("<@813849200831103047> <@744095326121754683> i found a card above 100 wishlist!!yayyyy");
+            WebhookMessage("<@744095326121754683> i found a card above 100 wishlist!!yayyyy");
             break;
         }
     }
@@ -138,30 +144,47 @@ bool try_finding_a_good_card_and_grab(){
     return dp;
 }
 
-bool gen_find_and_grab(){
-    bool dp = false;
+void CheckForPauseAndResume(){
     int red = 0;
     int green = 0;
     int blue = 0;
 
-    HDC hdc = GetDC(NULL); 
+    HDC hdc = GetDC(NULL);
 
     if (hdc == NULL) {
-        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
-        std::cerr << "Failed to get Device Context." << std::endl;
-        log("MASSIVE FAIL MAX SECURITY PRESS RED BUTTON FAIL FAIL DEVICE CONTEXT FAIL",true);
-        return dp;
-    }
-
-    //
-
-    if(dp == false){
-        log("clanker didnt find a good card",true);
+        DeviceContextFailMessage();
     }
     
+    COLORREF color = GetPixel(hdc,350,976);
 
+    red   = GetRValue(color);
+    green = GetGValue(color);
+    blue  = GetBValue(color);
+
+    //169 141 214 purple
+    //120 176 89 green 
+    if(red < 174 && red > 150 && green > 120 && green < 150 && blue > 180 && blue < 220){
+        WebhookMessage("Paused with the purple thing..");
+        log("Paused with the purple thing..",true);
+        while(true){
+           Sleep(60*1000);
+
+           COLORREF color = GetPixel(hdc,350,976);
+
+           red   = GetRValue(color);
+           green = GetGValue(color);
+           blue  = GetBValue(color);
+
+           if(!(red < 174 && red > 150 && green > 120 && green < 150 && blue > 180 && blue < 220)){
+              WebhookMessage("i dont see a purple cube anymore, going back to work, i hate my clanker life.");
+              log("Unpaused",true);
+              break;
+           }
+        }
+        
+    }
+    
     ReleaseDC(NULL, hdc);
-    return dp;
 }
 
 int main(){
@@ -191,12 +214,17 @@ int main(){
         temptext = "i did sd " + to_string(sdTimes+1) + " times hehehehe";
         WebhookMessage(temptext);
 
+        CheckForPauseAndResume();
+
         sdropsend();
-        Sleep(7000);
+        Sleep(4500);
+        Sleep((rand()%1000)+500);
         if(!try_finding_a_good_card_and_grab()){
             grabRandomCard();
         }
         else{
+            temptext = "i got " + to_string(clankerbrain+1) + " cards above 100 wl";
+            WebhookMessage(temptext);
             clankerbrain++;
         }
 
@@ -206,12 +234,20 @@ int main(){
 
         Sleep((8*60*1000)+5);
 
+        if(rand() % 60 == 0){
+            WebhookMessage("https://klipy.com/gifs/yuyuko-touhou-fumo");
+        }
+        else if(rand() % 70 == 0){
+            WebhookMessage("https://klipy.com/gifs/yuyuko-yuyuko-saigyouji");
+        }
+
         sdTimes++;
         cls();
     }
-    cout<<"Force Stopped with P!";
 
+    cout<<"Force Stopped with P!";
+    WebhookMessage("stopped with p chan wowwww");
+    WebhookMessage("https://tenor.com/view/yuyuko-fumo-cat-hug-snuggle-gif-3441104698059113185");
 
     return 0;
 }
-
