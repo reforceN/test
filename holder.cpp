@@ -1,27 +1,29 @@
 #include <windows.h>
 #include <iostream>
 #include <curl/curl.h>
+
 #define ll long long
+#define isPurple (red < 174 && red > 150 && green > 120 && green < 150 && blue > 180 && blue < 220)
 
 using namespace std;
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-// message bar: 368 1046
-// first heart: 350 975
-// second heart: 417 975
-// third heart: 476 977
 
 //r 88
 //g 101
 //b 242
 
 
-int x[] = {350,417,476};
-int y[] = {975,975,977};
+int x[] = {330,394,457};
+int y[] = {978,978,978};
 
-int xwish[] = {382,444,504};
+int xwish[] = {361,419,483};
 int ywish[] = {979,979,979};
+
+int squareCord[] = {326,972};
+
+int messageBar[] = {368, 1046};
+int sendButtom[] = {688,1046};
 
 int temp = 0;
 const string webhook_url = "";
@@ -80,18 +82,11 @@ void DeviceContextFailMessage(){
 }
 
 void sdropsend(){
-    mouseClick(368, 1046);
+    mouseClick(messageBar[0], messageBar[1]);
     typeKey(0x53);
     typeKey(0x44);
-    mouseClick(688,1046);
+    mouseClick(sendButtom[0], sendButtom[1]);
     log("did sd",true);
-}
-
-void sayRandomSpeech(){
-      mouseClick(368, 1046);
-      typeKey(0x43); typeKey(0x41); typeKey(0x47); typeKey(0x4F);
-      mouseClick(688,1046);
-      log("send random speech",true);
 }
 
 void grabCard_arraywise(int n){
@@ -155,7 +150,7 @@ void CheckForPauseAndResume(){
         DeviceContextFailMessage();
     }
     
-    COLORREF color = GetPixel(hdc,350,976);
+    COLORREF color = GetPixel(hdc,squareCord[0],squareCord[1]);
 
     red   = GetRValue(color);
     green = GetGValue(color);
@@ -163,20 +158,20 @@ void CheckForPauseAndResume(){
 
     //169 141 214 purple
     //120 176 89 green 
-    if(red < 174 && red > 150 && green > 120 && green < 150 && blue > 180 && blue < 220){
-        WebhookMessage("Paused with the purple thing..");
+    if(isPurple){
+        WebhookMessage("[sys] Paused with the purple thing..");
         log("Paused with the purple thing..",true);
         while(true){
            Sleep(60*1000);
 
-           COLORREF color = GetPixel(hdc,350,976);
+           COLORREF color = GetPixel(hdc,squareCord[0],squareCord[1]);
 
            red   = GetRValue(color);
            green = GetGValue(color);
            blue  = GetBValue(color);
 
-           if(!(red < 174 && red > 150 && green > 120 && green < 150 && blue > 180 && blue < 220)){
-              WebhookMessage("i dont see a purple cube anymore, going back to work, i hate my clanker life.");
+           if(!(isPurple)){
+              WebhookMessage("[sys] i dont see a purple cube anymore, going back to work, i hate my clanker life.");
               log("Unpaused",true);
               break;
            }
@@ -190,7 +185,7 @@ void CheckForPauseAndResume(){
 int main(){
     srand(time(__null));
 
-    WebhookMessage("Starting the thing hi uh im shy");
+    WebhookMessage("[sys] Starting the thing hi uh im shy");
     std::cout<<"Starting..\n Please close yasb and open discord halfscreen\n";
 
     Sleep(7000); //tab in
@@ -217,7 +212,7 @@ int main(){
         CheckForPauseAndResume();
 
         sdropsend();
-        Sleep(4500);
+        Sleep(4000);
         Sleep((rand()%1000)+500);
         if(!try_finding_a_good_card_and_grab()){
             grabRandomCard();
@@ -228,17 +223,24 @@ int main(){
             clankerbrain++;
         }
 
-        Sleep(3000);
-
-        //sayRandomSpeech();
+        Sleep(1000);
 
         Sleep((8*60*1000)+5);
 
-        if(rand() % 60 == 0){
+        if(rand() % 160 == 0){
             WebhookMessage("https://klipy.com/gifs/yuyuko-touhou-fumo");
         }
-        else if(rand() % 70 == 0){
+        else if(rand() % 170 == 0){
             WebhookMessage("https://klipy.com/gifs/yuyuko-yuyuko-saigyouji");
+        }
+        else if(rand() % 170 == 0){
+            WebhookMessage("https://cdn.discordapp.com/attachments/845296947182960664/1518274701686734868/togif.gif?ex=6a832701&is=6a81d581&hm=ef33bb9c89ebe00cd42a9cbc6ee30037d3af5ea7bad25cab10b0034d6d21483d&");
+        }
+        else if(rand() % 190 == 0){
+            WebhookMessage("https://klipy.com/gifs/fumo-touhou-6");
+        }
+        else if(rand() % 200 == 0){
+            WebhookMessage("https://cdn.discordapp.com/attachments/1098359555060154428/1215641607156801577/togif-5.gif?ex=6a830278&is=6a81b0f8&hm=65c3742285aa9eb2941746948a0cc61af2a3977a7acdc50ac4152201e80c37e3&");
         }
 
         sdTimes++;
