@@ -17,7 +17,7 @@ HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 int x[] = {330,394,457};
 int y[] = {978,978,978};
 
-int xwish[] = {361,419,483};
+int xwish[] = {360,421,483};
 int ywish[] = {979,979,979};
 
 int squareCord[] = {326,972};
