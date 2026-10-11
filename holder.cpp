@@ -9,10 +9,6 @@ using namespace std;
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-//r 88
-//g 101
-//b 242
-
 
 int x[] = {330,394,457};
 int y[] = {978,978,978};
@@ -24,6 +20,12 @@ int squareCord[] = {326,972};
 
 int messageBar[] = {368, 1046};
 int sendButtom[] = {688,1046};
+
+int basementChannelCord[] = {115, 472};
+int starboardChannelCord[] = {124, 472};
+
+bool hasCooldownReducer = false;
+bool areWeOnAnEvent = false;
 
 int temp = 0;
 const string webhook_url = "";
@@ -83,8 +85,8 @@ void DeviceContextFailMessage(){
 
 void sdropsend(){
     mouseClick(messageBar[0], messageBar[1]);
-    typeKey(0x53);
-    typeKey(0x44);
+    typeKey('S');
+    typeKey('D');
     mouseClick(sendButtom[0], sendButtom[1]);
     log("did sd",true);
 }
@@ -99,6 +101,48 @@ void grabCard_arraywise(int n){
 void grabRandomCard(){
     temp = (rand()%3);
     grabCard_arraywise(temp);
+}
+
+void tagCard(string tag){
+    mouseClick(messageBar[0], messageBar[1]);
+
+    while(true){
+        if(tag == "UNTAG"){
+            typeKey('S'); 
+            typeKey('U');
+            typeKey('T'); 
+            mouseClick(sendButtom[0], sendButtom[1]);
+            break;
+        }
+
+        typeKey('S'); 
+        typeKey('T'); 
+        typeKey(0x20); //space 
+
+        for(__int8 i = 0; i<tag.length(); ++i){
+            typeKey(tag[i]);
+        }
+        mouseClick(sendButtom[0], sendButtom[1]);
+
+        break;
+    }
+}
+
+void viewCard(){
+    mouseClick(messageBar[0], messageBar[1]);
+    typeKey('S'); 
+    typeKey('V'); 
+    mouseClick(sendButtom[0], sendButtom[1]);
+}
+
+void starboardCard(){
+    Sleep(1500);
+    mouseClick(starboardChannelCord[0],starboardChannelCord[1]);
+    Sleep(1500);
+    viewCard();
+    Sleep(1000);
+    mouseClick(basementChannelCord[0],basementChannelCord[1]);
+    Sleep(1500);
 }
 
 bool try_finding_a_good_card_and_grab(){
@@ -126,6 +170,10 @@ bool try_finding_a_good_card_and_grab(){
             dp = true;
             log("clanker thinks this card is better",true);
             WebhookMessage("<@744095326121754683> i found a card above 100 wishlist!!yayyyy");
+            Sleep(5000);
+            tagCard("INV");
+            Sleep(1000);
+            starboardCard();
             break;
         }
     }
@@ -162,7 +210,7 @@ void CheckForPauseAndResume(){
         WebhookMessage("[sys] Paused with the purple thing..");
         log("Paused with the purple thing..",true);
         while(true){
-           Sleep(60*1000);
+           Sleep(30*1000);
 
            COLORREF color = GetPixel(hdc,squareCord[0],squareCord[1]);
 
@@ -193,16 +241,21 @@ int main(){
     std::cout<<"Running..\n";
 
     int sdTimes = 0;
-    int clankerbrain = 0;
+    int cardsAbove100wl = 0;
+    int sdropCooldown = 8;
     ll t = time(0);
     string temptext = "";
 
-    while(!GetAsyncKeyState('P')){
+    if(hasCooldownReducer){
+        sdropCooldown = 7;
+    }
+
+    while(true){
         cout<<"sd: "; stc(10);
         cout<<sdTimes<<"\n"; stc(7);
 
         cout<<"catch by clanker: "; stc(10);
-        cout<<clankerbrain<<"\n"; stc(7);
+        cout<<cardsAbove100wl<<"\n"; stc(7);
 
         cout<<"time elapsed: "<<time(0)-t<<" seconds, "<<float((time(0)-t)/60.0f)<<" minutes, "<<float(((time(0)-t)/60.0f)/60.0f)<<" hours.\n";
 
@@ -213,20 +266,36 @@ int main(){
 
         sdropsend();
         Sleep(4000);
-        Sleep((rand()%1000)+500);
+        Sleep((rand()%1000)+800);
+
         if(!try_finding_a_good_card_and_grab()){
+            //if(areWeOnAnEvent){
+                //grabevent
+            //}
             grabRandomCard();
         }
         else{
-            temptext = "i got " + to_string(clankerbrain+1) + " cards above 100 wl";
+            temptext = "i got " + to_string(cardsAbove100wl+1) + " cards above 100 wl";
             WebhookMessage(temptext);
-            clankerbrain++;
+            cardsAbove100wl++;
         }
 
         Sleep(1000);
 
-        Sleep((8*60*1000)+5);
+        Sleep((sdropCooldown*60*1000)-6000);
 
+        sdTimes++;
+        cls();
+    }
+
+    //cout<<"Force Stopped with P!";
+    //WebhookMessage("stopped with p chan wowwww");
+    //WebhookMessage("https://tenor.com/view/yuyuko-fumo-cat-hug-snuggle-gif-3441104698059113185");
+
+    return 0;
+}
+
+/*
         if(rand() % 160 == 0){
             WebhookMessage("https://klipy.com/gifs/yuyuko-touhou-fumo");
         }
@@ -242,14 +311,4 @@ int main(){
         else if(rand() % 200 == 0){
             WebhookMessage("https://cdn.discordapp.com/attachments/1098359555060154428/1215641607156801577/togif-5.gif?ex=6a830278&is=6a81b0f8&hm=65c3742285aa9eb2941746948a0cc61af2a3977a7acdc50ac4152201e80c37e3&");
         }
-
-        sdTimes++;
-        cls();
-    }
-
-    cout<<"Force Stopped with P!";
-    WebhookMessage("stopped with p chan wowwww");
-    WebhookMessage("https://tenor.com/view/yuyuko-fumo-cat-hug-snuggle-gif-3441104698059113185");
-
-    return 0;
-}
+*/
